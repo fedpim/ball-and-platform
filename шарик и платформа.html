@@ -1,0 +1,120 @@
+<html>
+  <head>
+    <title>шарик платформа</title>
+    <style>
+      canvas {
+        background: #eee;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="myCanvas"></canvas>
+    <script>
+      var canvas = document.getElementById('myCanvas');
+      var ctx = canvas.getContext('2d');
+      var wcanvas = 800;
+      var hcanvas = 480;
+      myCanvas.width = wcanvas;
+      myCanvas.height = hcanvas;
+      var ballRadius = 10;
+      var ballColor = '#FF0000';
+      var x = canvas.width / 2;
+      var y = canvas.height / 2;
+      var dx = 1.5;
+      var dy = 1.5;
+      var plWidth = 100;
+      var plHeight = 10;
+      var rectColor = '#00FF00';
+      var plx = (canvas.width - plWidth) / 2;
+      var rPress = false;
+      var lPress = false;
+      var rPress;
+      var lPress;
+      var interval = setInterval(draw, 10);
+      var dPl = 3;
+      var objRow = 6;
+      var objColumn = 7;
+      var objWidth = 75;
+      var objHeight = 20;
+      var objPadding = 10;
+      var objOffTop = 30;
+      var objOffLeft = 30;
+      var objects = [];
+
+      console.log('objects=', objects);
+
+      // objects[c][r].x = objX;
+      // objects[c][r].y = objY;
+      // ctx.beginPath();
+      // ctx.fillStyle = "yellow";
+      // ctx.fillRect();
+
+      function drawObj() {
+        for (var c = 0; c < objColumn; c++) {
+          objects[c] = [];
+          for (var r = 0; r < objRow; r++) {
+            objects[c][r] = { x: 0, y: 0 };
+          }
+        }
+        var objX = objOffLeft + c * (objWidth + objPadding); //этм 2 строки были на 46 - там c ещё неизвестно + тут было objWitdh :)
+        var objY = objOffTop + c * (objHeight + objPadding);
+        objects[c][r].x = objX;
+        objects[c][r].y = objY; //62-65 - а не должны ли они быть внутри цикла, чтобы присваивались новые координаты кучи блоков?
+        ctx.beginPath();
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect();
+      }
+      function drawBall() {
+        ctx.beginPath();
+        ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = ballColor;
+        ctx.fill();
+        ctx.closePath();
+      }
+      function drawPl() {
+        ctx.beginPath();
+        ctx.rect(plx, hcanvas - 20, plWidth, plHeight);
+        ctx.fillStyle = rectColor;
+        ctx.fill();
+        ctx.closePath();
+      }
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawObj();
+        drawBall();
+        x += dx;
+        y += dy;
+        if (x > canvas.width - ballRadius || x < ballRadius) dx = -dx;
+        if (y < ballRadius) dy = -dy;
+        else if (y + ballRadius + plHeight > canvas.height - ballRadius) {
+          if (x > plx && x < plx + plWidth) {
+            dy = 1.2 * -dy;
+            dx = 1.2 * dx;
+            dPl = 1.2 * dPl;
+          } else {
+            alert('Game over!');
+            document.location.reload();
+            clearInterval(interval);
+          }
+        }
+        drawPl();
+        if (lPress == true && plx > 0) plx -= dPl;
+        else if (rPress == true && plx < wcanvas - plWidth) plx += dPl;
+      }
+      function keyDownHandler(event) {
+        if (event.code == 'KeyD') rPress = true;
+        if (event.code == 'KeyA') lPress = true;
+      }
+      function keyUpHandler(event) {
+        if (event.code == 'KeyD') rPress = false;
+        if (event.code == 'KeyA') lPress = false;
+      }
+      document.addEventListener('keydown', keyDownHandler, false);
+      document.addEventListener('keyup', keyUpHandler, false);
+      interval;
+    </script>
+  </body>
+</html>
